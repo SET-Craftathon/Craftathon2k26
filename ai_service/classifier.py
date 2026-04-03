@@ -56,7 +56,7 @@ def _derive_risk_score(confidence: float) -> str:
     return "HIGHEST"
 
 
-def classify(cleaned_text: str) -> ClassificationResult:
+def _classify(cleaned_text: str) -> ClassificationResult:
     # Guard: empty or whitespace-only input after URL extraction.
     # The model produces meaningless output on blank strings, so we
     # short-circuit immediately and return a sentinel result.
