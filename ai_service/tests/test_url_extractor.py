@@ -4,6 +4,10 @@ from ai_service.url_extractor import extract_urls
 
 class TestURLExtractor:
 
+    # -------------------------
+    # BASIC TESTS
+    # -------------------------
+
     def test_single_url(self):
         text = "Check this https://example.com"
         urls, clean = extract_urls(text)
@@ -70,7 +74,6 @@ class TestURLExtractor:
         assert urls == ["https://example.com/path?x=1#section"]
         assert clean == "Check"
 
-
     # -------------------------
     # PARAMETRIZED TESTS
     # -------------------------
@@ -84,68 +87,61 @@ class TestURLExtractor:
             ("Repeat https://a.com https://a.com", ["https://a.com", "https://a.com"], "Repeat"),
         ],
     )
-    def test_parametrized_basic(text, expected_urls, expected_clean):
+    def test_parametrized_basic(self, text, expected_urls, expected_clean):
         urls, clean = extract_urls(text)
 
         assert urls == expected_urls
         assert clean == expected_clean
 
-
     # -------------------------
     # FEATURE TESTS
     # -------------------------
 
-    def test_normalization():
+    def test_normalization(self):
         text = "Visit www.google.com"
         urls, _ = extract_urls(text, normalize=True)
 
         assert urls == ["http://www.google.com"]
 
-
-    def test_deduplication():
+    def test_deduplication(self):
         text = "Repeat https://a.com https://a.com"
         urls, _ = extract_urls(text, deduplicate=True)
 
         assert urls == ["https://a.com"]
 
-
     # -------------------------
     # EDGE CASES
     # -------------------------
 
-    def test_punctuation_noise():
+    def test_punctuation_noise(self):
         text = "Wow!!! https://example.com/test?!"
         urls, clean = extract_urls(text)
 
         assert urls == ["https://example.com/test"]
         assert clean == "Wow!!!"
 
-
-    def test_mixed_content():
+    def test_mixed_content(self):
         text = "Check (https://a.com), [https://b.com] and https://c.com!"
         urls, clean = extract_urls(text)
 
         assert urls == ["https://a.com", "https://b.com", "https://c.com"]
         assert "https://" not in clean
 
-
-    def test_markdown_links():
+    def test_markdown_links(self):
         text = "Click [Google](https://google.com)"
         urls, clean = extract_urls(text)
 
         assert urls == ["https://google.com"]
         assert "https://google.com" not in clean
 
-
-    def test_large_input():
+    def test_large_input(self):
         text = "Hello " * 1000 + " https://example.com " + "world " * 1000
         urls, clean = extract_urls(text)
 
         assert urls == ["https://example.com"]
         assert "https://example.com" not in clean
 
-
-    def test_random_noise():
+    def test_random_noise(self):
         text = "asd123 !@# https://a.com ??? www.b.com ###"
         urls, _ = extract_urls(text)
 
