@@ -32,7 +32,7 @@ def normalize_url(url: str) -> str:
     return url
 
 
-def extract_urls(text: str, *, deduplicate: bool = False, normalize: bool = False) -> Tuple[List[str], str]:
+def _extract_urls(text: str, *, deduplicate: bool = False, normalize: bool = False) -> Tuple[List[str], str]:
     """
     Extract URLs and return cleaned text.
 
@@ -76,3 +76,7 @@ def extract_urls(text: str, *, deduplicate: bool = False, normalize: bool = Fals
         urls = list(dict.fromkeys(urls))
 
     return urls, cleaned_text
+
+# public method for usage and private for flexibility
+def extract_urls(text: str) -> Tuple[List[str], str]:
+    return _extract_urls(text, deduplicate=False, normalize=False)
