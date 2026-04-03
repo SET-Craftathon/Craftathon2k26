@@ -9,7 +9,7 @@ pytest ai_service/tests/test_classifier.py -v
 """
 
 import pytest
-from ai_service.classifier import classify
+from ai_service.models.nlp import classify
 
 TEST_CASES = [
     ("send me pics and don’t tell anyone", "grooming"),

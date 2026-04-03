@@ -54,7 +54,7 @@ ai_service/test_images/4.jpg -> {'all_scores': {'accident': 0.007409,
  'label': 'normal_scene'}
 """
 
-from ai_service.clip import classify_image
+from ai_service.models.clip import classify_image
 from pprint import pprint
 
 images = [

@@ -20,7 +20,7 @@ Path Found: ai_service/test_images/5.jpeg
 ai_service/test_images/5.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
 """
 
-from ai_service.nsfw import detect_nsfw
+from ai_service.models.nsfw import detect_nsfw
 
 images = [
     "ai_service/test_images/1.jpeg",

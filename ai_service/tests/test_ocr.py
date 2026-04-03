@@ -50,8 +50,8 @@ ClassificationResult(top_label='needs_review',
 
 """
 
-from ai_service.ocr import extract_text
-from ai_service.classifier import classify
+from ai_service.models.ocr import extract_text
+from ai_service.models.nlp import classify
 from pprint import pprint
 
 images = [
