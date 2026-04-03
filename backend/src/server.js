@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const connectDB = require('./lib/db');
 const healthRoutes = require('./routes/health.route');
-const reportRoutes = require('./routes/report.route');
+const reportGenerate = require('./routes/report.route');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
