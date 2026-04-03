@@ -24,7 +24,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// const reportRoutes = require("./routes/reportRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 // Routes
 app.use('/api', healthRoutes);
