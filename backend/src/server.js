@@ -5,6 +5,8 @@ require('dotenv').config();
 const connectDB = require('./lib/db');
 const healthRoutes = require('./routes/health.route');
 const reportGenerate = require('./routes/report.route');
+const authRoutes = require('./routes/auth.route');
+const dashboardRoutes = require('./routes/dashboard.route');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,6 +31,8 @@ const reportRoutes = require("./routes/reportRoutes");
 // Routes
 app.use('/api', healthRoutes);
 app.use("/api/upload", reportRoutes);
+app.use('/api/admin', authRoutes);
+app.use('/api/admin/dashboard', dashboardRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {
@@ -63,13 +67,7 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`
-╔═══════════════════════════════════╗
-║   Craftathon Backend Server       ║
-║   Environment: ${NODE_ENV.padEnd(19)} ║
-║   Port: ${PORT.toString().padEnd(25)} ║
-╚═══════════════════════════════════╝
-  `);
+  console.log(`✅ Server is Running`);
 });
 
 module.exports = app;

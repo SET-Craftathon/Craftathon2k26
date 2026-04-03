@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Brand */
+  --color-primary: oklch(55% 0.22 270);
+  --color-accent: oklch(80% 0.15 195);
+
+  /* Severity */
+  --severity-low:      oklch(68% 0.18 145);
+  --severity-medium:   oklch(78% 0.18 85);
+  --severity-high:     oklch(70% 0.20 45);
+  --severity-critical: oklch(62% 0.25 25);
+
+  /* Cursor */
+  --mouse-x: 0px;
+  --mouse-y: 0px;
+
+  /* LIGHT MODE (Default) */
+  --bg-scene-1: #f8fafc;
+  --bg-scene-2: #f1f5f9;
+  --bg-scene-3: #e2e8f0;
+  --bg-base: #f8fafc;
+  --bg-mid: #f1f5f9;
+
+  --neutral-950: oklch(98% 0.002 260);
+  --neutral-900: oklch(95% 0.002 260);
+  --neutral-800: oklch(90% 0.004 260);
+  --neutral-700: oklch(80% 0.004 260);
+  --neutral-600: oklch(60% 0.006 260);
+  --neutral-500: oklch(45% 0.008 260);
+  --neutral-400: oklch(35% 0.008 260);
+  --neutral-300: oklch(25% 0.008 260);
+  --text-main: #111827;
+  
+  --bg-surface: oklch(100% 0.001 260 / 0.95);
+  --bg-surface-trans: oklch(100% 0.001 260 / 0.8);
+  --bg-surface-trans-more: oklch(100% 0.001 260 / 0.6);
+  
+  --border-05: oklch(0% 0 0 / 0.06);
+  --border-06: oklch(0% 0 0 / 0.08);
+  --border-07: oklch(0% 0 0 / 0.1);
+  --border-08: oklch(0% 0 0 / 0.12);
+  --border-1: oklch(0% 0 0 / 0.15);
+  
+  --card-border: oklch(0% 0 0 / 0.05);
+  --card-shadow-inset-1: oklch(0% 0 0 / 0.02);
+  --card-shadow-inset-2: oklch(0% 0 0 / 0.03);
+  --chart-text: #6b7280;
+}
+
+.dark {
+  /* DARK MODE */
+  --bg-scene-1: #070B14;
+  --bg-scene-2: #0B0F1A;
+  --bg-scene-3: #121826;
+  --bg-base: #070B14;
+  --bg-mid: #0B0F1A;
+
+  --neutral-950: oklch(8% 0.008 260);
+  --neutral-900: oklch(12% 0.008 260);
+  --neutral-800: oklch(18% 0.008 260);
+  --neutral-700: oklch(26% 0.008 260);
+  --neutral-600: oklch(40% 0.008 260);
+  --neutral-500: oklch(55% 0.008 260);
+  --neutral-400: oklch(65% 0.008 260);
+  --neutral-300: oklch(75% 0.008 260);
+  --text-main: #f9fafb;
+
+  --bg-surface: oklch(13% 0.01 260 / 0.95);
+  --bg-surface-trans: oklch(10% 0.008 260 / 0.8);
+  --bg-surface-trans-more: oklch(10% 0.008 260 / 0.6);
+  
+  --border-05: oklch(100% 0 0 / 0.05);
+  --border-06: oklch(100% 0 0 / 0.06);
+  --border-07: oklch(100% 0 0 / 0.07);
+  --border-08: oklch(100% 0 0 / 0.08);
+  --border-1: oklch(100% 0 0 / 0.1);
+  
+  --card-border: oklch(100% 0 0 / 0.05);
+  --card-shadow-inset-1: oklch(100% 0 0 / 0.03);
+  --card-shadow-inset-2: oklch(100% 0 0 / 0.06);
+  --chart-text: #9ca3af;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  cursor: none;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--neutral-300);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* === Layered background === */
+.bg-scene {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at var(--mouse-x) var(--mouse-y),
+      rgba(99, 102, 241, 0.06) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 120% 80% at 0% 0%,
+      rgba(109, 40, 217, 0.08) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      160deg,
+      var(--bg-scene-1) 0%,
+      var(--bg-scene-2) 50%,
+      var(--bg-scene-3) 100%
+    );
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--neutral-950); }
+::-webkit-scrollbar-thumb { background: var(--neutral-800); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neutral-700); }
+
+/* === Focus rings === */
+:focus-visible {
+  outline: 2px solid var(--focus-ring, var(--color-primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus-ring, var(--color-primary)) 20%, transparent);
+}
+
+/* === Keyframes === */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--severity-critical) 30%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--severity-critical) 50%, transparent); }
+  50%       { box-shadow: 0 0 12px 2px color-mix(in srgb, var(--severity-critical) 25%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--severity-critical) 80%, transparent); }
+}
+
+@keyframes live-breathe {
+  0%, 100% { transform: scale(1.0); opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.85; }
+}
+
+@keyframes spin-slow {
+  from { --gradient-angle: 0deg; }
+  to   { --gradient-angle: 360deg; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* === Utility classes === */
+.tabular { font-variant-numeric: tabular-nums; }
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--card-border);
+  box-shadow:
+    0 0 0 1px var(--card-shadow-inset-1),
+    inset 0 1px 0 var(--card-shadow-inset-2),
+    0 4px 14px rgba(0, 0, 0, 0.1),
+    0 4px 24px rgba(0, 0, 0, 0.15),
+    0 0 40px rgba(99, 102, 241, 0.04);
+  border-radius: 12px;
+}
+
+.card-primary {
+  background: linear-gradient(135deg, #6D28D9 0%, #4F46E5 100%);
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.15),
+    0 0 60px rgba(99, 102, 241, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--neutral-900) 25%,
+    var(--neutral-800) 50%,
+    var(--neutral-900) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 6px;
+}
+
+.severity-critical { animation: glow-pulse 2s ease-in-out infinite; }
+
+.live-dot {
+  display: inline-block;
+  animation: live-breathe 2s ease-in-out infinite;
+}
