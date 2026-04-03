@@ -1,23 +1,13 @@
 """
-Test file for testing the NSFW model for it's analysis of NSFW content on given images
+NSFW Image Detection Demo
+
+This module runs the NSFW detection model on sample images and prints results.
+
+Usage:
+    python -m ai_service.tests.test_nsfw
 
 Author:
-- Vishmayraj
-
-Input:
-python -m ai_service.tests.test_nsfw
-
-Output:
-Path Found: ai_service/test_images/1.jpeg
-ai_service/test_images/1.jpeg -> {'is_nsfw': False, 'confidence': 0.9994, 'severity': 'LOW'}
-Path Found: ai_service/test_images/2.jpeg
-ai_service/test_images/2.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
-Path Found: ai_service/test_images/3.jpeg
-ai_service/test_images/3.jpeg -> {'is_nsfw': False, 'confidence': 0.9959, 'severity': 'LOW'}
-Path Found: ai_service/test_images/4.jpeg
-ai_service/test_images/4.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
-Path Found: ai_service/test_images/5.jpeg
-ai_service/test_images/5.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
+    Vishmayraj
 """
 
 from ai_service.models.nsfw import detect_nsfw
@@ -29,6 +19,12 @@ images = [
     "ai_service/test_images/4.jpg",
 ]
 
-for img in images:
-    result = detect_nsfw(img)
-    print(f"{img} -> {result}")
+
+def run_tests():
+    for img in images:
+        result = detect_nsfw(img)
+        print(f"{img} -> {result}")
+
+
+if __name__ == "__main__":
+    run_tests()

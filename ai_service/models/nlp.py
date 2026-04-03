@@ -96,7 +96,7 @@ def _derive_risk_score(confidence: float) -> str:
     return "HIGHEST"
 
 
-def _classify(cleaned_text: str) -> ClassificationResult:
+def classify(cleaned_text: str) -> ClassificationResult:
     """
     Perform zero-shot classification on cleaned input text.
 

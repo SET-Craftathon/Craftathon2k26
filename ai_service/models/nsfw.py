@@ -1,3 +1,27 @@
+"""
+nsfw_detector.py
+
+NSFW (Not Safe For Work) image detection module using a pretrained vision model.
+
+This module:
+- Loads a pretrained NSFW classifier model
+- Accepts image input in multiple formats
+- Returns NSFW probability, classification confidence, and severity level
+
+Model:
+    Falconsai/nsfw_image_detection
+
+Device:
+    - Uses GPU (CUDA) if available
+    - Falls back to CPU otherwise
+
+Public API:
+    detect_nsfw(image) -> dict
+
+Author:
+    Vishmayraj
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,6 +40,22 @@ _model: AutoModelForImageClassification | None = None
 
 
 def _load_model() -> tuple[AutoFeatureExtractor, AutoModelForImageClassification]:
+    """
+    Lazily load the NSFW detection model and feature extractor.
+
+    This function ensures:
+    - Model is loaded only once (singleton pattern)
+    - Subsequent calls reuse the cached model
+
+    Returns:
+        tuple:
+            - AutoFeatureExtractor: Preprocessing utility for images
+            - AutoModelForImageClassification: Loaded vision model
+
+    Notes:
+        - This improves performance in long-running services (e.g., FastAPI)
+        - Model is set to evaluation mode to disable training behavior
+    """
     global _extractor, _model
     if _extractor is None or _model is None:
         _extractor = AutoFeatureExtractor.from_pretrained(_MODEL_ID)
@@ -25,6 +65,29 @@ def _load_model() -> tuple[AutoFeatureExtractor, AutoModelForImageClassification
 
 
 def _to_pil(image: Union[str, Path, Image.Image]) -> Image.Image:
+    """
+    Convert input image into a PIL RGB image.
+
+    Supported input types:
+        - File path (str or Path)
+        - PIL Image object
+
+    Args:
+        image (Union[str, Path, Image.Image]):
+            Input image in supported format.
+
+    Returns:
+        PIL.Image.Image:
+            Image converted to RGB format.
+
+    Raises:
+        TypeError:
+            If the input type is not supported.
+
+    Notes:
+        - Ensures consistent input format for the model
+        - Always converts to RGB to avoid channel inconsistencies
+    """
     if isinstance(image, (str, Path)):
         return Image.open(image).convert("RGB")
     if isinstance(image, Image.Image):
@@ -33,6 +96,25 @@ def _to_pil(image: Union[str, Path, Image.Image]) -> Image.Image:
 
 
 def _severity(confidence: float) -> str:
+    """
+    Map NSFW confidence score to a severity level.
+
+    Args:
+        confidence (float):
+            NSFW probability score between 0 and 1.
+
+    Returns:
+        str:
+            Severity level:
+                - LOW
+                - MEDIUM
+                - HIGH
+
+    Logic:
+        - >= 0.80 → HIGH
+        - >= 0.50 → MEDIUM
+        - otherwise → LOW
+    """
     if confidence >= 0.80:
         return "HIGH"
     if confidence >= 0.50:
@@ -41,6 +123,48 @@ def _severity(confidence: float) -> str:
 
 
 def detect_nsfw(image: Union[str, Path, Image.Image]) -> dict:
+    """
+    Detect whether an image contains NSFW (Not Safe For Work) content.
+
+    Args:
+        image (Union[str, Path, Image.Image]):
+            Input image which can be:
+                - File path (string or Path)
+                - PIL Image object
+
+    Returns:
+        dict:
+            {
+                "is_nsfw": bool,        # True if NSFW detected
+                "confidence": float,    # Confidence score (0.0 - 1.0)
+                "severity": str         # LOW | MEDIUM | HIGH
+            }
+
+    Behavior:
+        - Runs inference using a pretrained vision model
+        - Computes softmax probabilities over all classes
+        - Identifies NSFW-related classes and extracts max probability
+        - Falls back to non-safe class grouping if no explicit NSFW label exists
+
+    Thresholds:
+        - NSFW detection threshold: 0.50
+        - Confidence:
+            - If NSFW → raw NSFW probability
+            - If SAFE → (1 - NSFW probability)
+
+    Error Handling:
+        - If any error occurs during processing:
+            Returns a safe fallback:
+                {
+                    "is_nsfw": False,
+                    "confidence": 0.0,
+                    "severity": "LOW"
+                }
+
+    Notes:
+        - Designed for robustness in production systems
+        - Errors are intentionally swallowed to prevent pipeline crashes
+    """
     try:
         extractor, model = _load_model()
         pil_image = _to_pil(image)
@@ -54,11 +178,13 @@ def detect_nsfw(image: Union[str, Path, Image.Image]) -> dict:
         label_map = model.config.id2label
 
         nsfw_score = 0.0
+
+        # Primary NSFW label detection
         for idx, label in label_map.items():
             if label.lower() in ("nsfw", "explicit", "unsafe", "porn", "hentai", "sexy"):
                 nsfw_score = max(nsfw_score, probs[idx].item())
 
-        # If no explicit NSFW label found, treat non-"normal"/"sfw" classes as NSFW
+        # Fallback: treat non-safe labels as NSFW
         if nsfw_score == 0.0:
             for idx, label in label_map.items():
                 if label.lower() not in ("normal", "sfw", "safe"):
