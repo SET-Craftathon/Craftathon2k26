@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Site Blocked — POCSO SafeGuard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0a0f;
+      color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated radial danger glow */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(220,38,38,0.18) 0%, transparent 70%);
+      animation: pulse 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.5; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 10;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(220,38,38,0.3);
+      border-radius: 20px;
+      padding: 48px 56px;
+      max-width: 580px;
+      width: 90%;
+      text-align: center;
+      box-shadow:
+        0 0 0 1px rgba(220,38,38,0.1),
+        0 0 60px rgba(220,38,38,0.15),
+        0 32px 64px rgba(0,0,0,0.6);
+      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .shield-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      box-shadow: 0 0 40px rgba(220,38,38,0.4);
+      animation: iconPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(220,38,38,0.4); }
+      50%       { box-shadow: 0 0 60px rgba(220,38,38,0.7); }
+    }
+
+    .shield-icon svg {
+      width: 36px;
+      height: 36px;
+      fill: white;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(220,38,38,0.12);
+      border: 1px solid rgba(220,38,38,0.35);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f87171;
+      margin-bottom: 20px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    h1 span { color: #f87171; }
+
+    p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 6px;
+    }
+
+    .url-box {
+      display: inline-block;
+      background: rgba(220,38,38,0.1);
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-family: monospace;
+      color: #fca5a5;
+      word-break: break-all;
+      margin: 16px 0 28px;
+      max-width: 100%;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 24px 0;
+    }
+
+    .info {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.7;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 28px;
+      padding: 11px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+    }
+
+    .btn-back {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .btn-back:hover {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="shield-icon">
+      <!-- Shield SVG -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2zm-1 13l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/>
+      </svg>
+    </div>
+
+    <div class="badge">
+      <span class="badge-dot"></span>
+      POCSO SafeGuard — Threat Detected
+    </div>
+
+    <h1>Access <span>Blocked</span></h1>
+    <p>This website has been flagged as <strong style="color:#fca5a5">unsafe</strong> and may contain phishing, defacement, or malicious content.</p>
+
+    <div class="url-box" id="flaggedUrl">Loading...</div>
+
+    <p>To protect you and others, your connection to this site has been terminated by the <strong style="color:#fff">POCSO SafeGuard Extension</strong>.</p>
+
+    <div class="divider"></div>
+
+    <p class="info">If you believe this is a mistake, please report it to your system administrator. This domain has been identified from a verified threat intelligence dataset.</p>
+
+    <button class="btn btn-back" onclick="history.back()">
+      ← Go Back to Safety
+    </button>
+  </div>
+
+  <div class="footer">POCSO SafeGuard &bull; Threat Intelligence Engine v1.0</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get('url') || 'Unknown site';
+    document.getElementById('flaggedUrl').textContent = url;
+    document.title = `Blocked: ${url} — POCSO SafeGuard`;
+  </script>
+</body>
+</html>
