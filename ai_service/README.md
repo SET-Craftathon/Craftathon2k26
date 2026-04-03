@@ -132,19 +132,42 @@ pytest -s
 
 ---
 
+```
+curl -s -X POST http://localhost:8000/classify -H "Content-Type: application/json" -d "{\"text\": \"If you tell anyone I will make you regret it\"}" | python -m json.tool
+```
 ## Module Structure
 
 ```sh
-ai_service/
-│   classifier.py
-│   main.py
-│   url_extractor.py
-│   requirements.txt
-│   README.md
-│   pytest.ini
-│   conftest.py
-│
-└───tests/
-        test_url_extractor.py
-        test_classifier.py
-
+├───ai_service
+│   │   .gitignore
+│   │   api.py
+│   │   conftest.py
+│   │   orchestrator.py
+│   │   pytest.ini
+│   │   README.md
+│   │   requirements-dev.txt
+│   │   requirements.txt
+│   │   url_extractor.py
+│   │   __init__.py
+│   │
+│   │
+│   ├───models
+│   │   │   clip.py
+│   │   │   nlp.py
+│   │   │   nsfw.py
+│   │   └───ocr.py
+│   │
+│   │
+│   ├───tests
+│   │   │   test_classifier.py
+│   │   │   test_clip.py
+│   │   │   test_nsfw.py
+│   │   │   test_ocr.py
+│   │   └───test_url_extractor.py
+│   │
+│   ├───test_images
+│   │       1.jpeg
+│   │       2.jpeg
+│   │       3.jpg
+│   │       4.jpg
+```
