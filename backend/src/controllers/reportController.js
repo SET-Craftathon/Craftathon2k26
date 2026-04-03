@@ -19,14 +19,7 @@ exports.handleReport = async (req, res) => {
         const evidenceCID = results.map((r) => r.evidenceCID);
         const evidenceURL = results.map((r) => r.evidenceURL);
 
-        // 🧹 Cleanup
-        req.files.forEach((file) => {
-            try {
-                fs.unlinkSync(file.path);
-            } catch (err) {
-                console.error("File delete error:", err);
-            }
-        });
+
 
         // 🧠 Create JSON
         const reportJSON = {
@@ -81,5 +74,18 @@ exports.handleReport = async (req, res) => {
     } catch (error) {
         console.error("Full Flow Error:", error);
         return res.status(500).json({ error: "Report processing failed" });
+    } finally {
+        // 🧹 Cleanup files always, even on error
+        if (req.files) {
+            req.files.forEach((file) => {
+                try {
+                    if (fs.existsSync(file.path)) {
+                        fs.unlinkSync(file.path);
+                    }
+                } catch (err) {
+                    console.error("File delete error:", err);
+                }
+            });
+        }
     }
 };
