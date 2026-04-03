@@ -23,8 +23,11 @@ app.use((req, res, next) => {
   next();
 });
 
+const reportRoutes = require("./routes/reportRoutes");
+
 // Routes
 app.use('/api', healthRoutes);
+app.use("/api/upload", reportRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {
