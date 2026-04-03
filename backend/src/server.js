@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const connectDB = require('./lib/db');
 const healthRoutes = require('./routes/health.route');
+const reportGenerate = require('./routes/report.route');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: [
       { path: '/api/health', method: 'GET', description: 'Health check' },
+      { path: '/api/report', method: 'POST', description: 'Submit a report' },
     ],
   });
 });

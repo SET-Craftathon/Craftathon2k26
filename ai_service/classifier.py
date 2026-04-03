@@ -14,7 +14,7 @@ from transformers import pipeline
 _classifier = pipeline(
     "zero-shot-classification",
     model="facebook/bart-large-mnli",
-    device=0,  # CPU; swap to device=0 if GPU is available
+    device=-1,  # CPU; swap to device=0 if GPU is available
 )
 
 LABELS: list[str] = [
