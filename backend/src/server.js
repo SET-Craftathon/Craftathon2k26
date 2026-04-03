@@ -67,13 +67,7 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`
-╔═══════════════════════════════════╗
-║   Craftathon Backend Server       ║
-║   Environment: ${NODE_ENV.padEnd(19)} ║
-║   Port: ${PORT.toString().padEnd(25)} ║
-╚═══════════════════════════════════╝
-  `);
+  console.log(`✅ Server is Running`);
 });
 
 module.exports = app;

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { uploadToIPFS, uploadJSONToIPFS } = require("../services/ipfsService");
 const { storeReportOnChain } = require("../services/blockchainService");
+const Report = require("../models/reportModel");
 
 exports.handleReport = async (req, res) => {
     try {
@@ -59,7 +60,23 @@ exports.handleReport = async (req, res) => {
             txHash,
         };
 
-        return res.json(finalResponse);
+        // 💾 Save to MongoDB
+        const savedReport = await Report.create({
+            reportId: String(finalResponse.reportId),
+            severity: finalResponse.severity,
+            referenceURL: finalResponse.referenceURL || "",
+            description: finalResponse.discription || finalResponse.description || "",
+            contentType: finalResponse.contentType,
+            aiConfidence: finalResponse.aiConfidence,
+            evidenceCID: finalResponse.evidenceCID,
+            status: finalResponse.status,
+            evidenceCount: finalResponse.evidenceCount,
+            evidenceURL: finalResponse.evidenceURL,
+            reportCID: finalResponse.reportCID,
+            txHash: finalResponse.txHash,
+        });
+
+        return res.json(savedReport);
 
     } catch (error) {
         console.error("Full Flow Error:", error);

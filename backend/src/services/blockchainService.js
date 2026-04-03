@@ -15,19 +15,19 @@ const contract = new ethers.Contract(
 );
 
 async function storeReportOnChain(data) {
-  const tx = await contract.createReport(
-    Number(data.reportId),
-    data.reportCID,
-    data.severity,
-    data.contentType,
-    data.evidenceCID,
-    data.referenceURL || "",
+    const tx = await contract.createReport(
+      Number(data.reportId),
+      data.reportCID,
+      data.severity,
+      data.contentType,
+      data.evidenceCID,
+      data.referenceURL || "",
     data.aiConfidence ? data.aiConfidence.toString() : ""
   );
 
   const receipt = await tx.wait();
 
-  return receipt.hash;
+    return receipt.hash;
 }
 
 module.exports = { storeReportOnChain };
