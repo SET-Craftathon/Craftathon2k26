@@ -4,7 +4,7 @@ A secure, anonymous, tamper-proof reporting platform using blockchain and AI.
 
 ---
 
-## Author - <yourname>
+## Author - Vishmayraj
 
 ### Deliverables
 - text_classifier (grooming / sexual / threat classification)
