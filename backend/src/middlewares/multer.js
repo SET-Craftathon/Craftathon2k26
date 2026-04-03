@@ -1,10 +1,18 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-// 📦 Storage config
+
+const uploadDir = path.join(__dirname, "..", "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueName =
@@ -14,16 +22,17 @@ const storage = multer.diskStorage({
   },
 });
 
-// accept any file type 
+
 const fileFilter = (req, file, cb) => {
-  cb(null, true); // allow everything
+  cb(null, true);
 };
+
 
 const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit (adjust if needed)
+    fileSize: 50 * 1024 * 1024,
   },
 });
 
