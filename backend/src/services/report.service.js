@@ -37,7 +37,7 @@ const analyzeText = async (text) => {
 
   // Try real FastAPI, fallback to mock if unavailable
   try {
-    const response = await axios.post(`${FASTAPI_URL}/analyze`, {
+    const response = await axios.post(`${FASTAPI_URL}/classify`, {
       text,
     });
     return response.data;
