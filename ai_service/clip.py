@@ -1,17 +1,3 @@
-"""
-Output:
-Path Found: ai_service/test_images/1.jpeg
-ai_service/test_images/1.jpeg -> {'is_nsfw': False, 'confidence': 0.9994, 'severity': 'LOW'}
-Path Found: ai_service/test_images/2.jpeg
-ai_service/test_images/2.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
-Path Found: ai_service/test_images/3.jpeg
-ai_service/test_images/3.jpeg -> {'is_nsfw': False, 'confidence': 0.9959, 'severity': 'LOW'}
-Path Found: ai_service/test_images/4.jpeg
-ai_service/test_images/4.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
-Path Found: ai_service/test_images/5.jpeg
-ai_service/test_images/5.jpeg -> {'is_nsfw': False, 'confidence': 0.9998, 'severity': 'LOW'}
-"""
-
 import torch
 import torch.nn.functional as F
 from PIL import Image
