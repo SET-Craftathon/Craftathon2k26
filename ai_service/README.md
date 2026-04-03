@@ -1,46 +1,126 @@
-# AI MODULE SPEC
+# AI SERVICE MODULE
 
-**Goal:** Process user-submitted text to extract URLs and classify content risk using NLP.
+## Overview
+
+This module processes user-submitted text to:
+
+1. Extract URLs
+2. Clean the text for NLP processing
+3. (Next) Classify content risk
+
+---
+
+## Current Status
+
+✅ URL Extraction — **COMPLETED**
+⏳ Text Classification — **IN PROGRESS**
+
+---
 
 ## Module Structure
 
 ```sh
-├───ai-service
-│       classifier.py
-│       main.py
-│       README.md
-│       requirements.txt
-│       url-extractor.py
+ai_service/
+│   classifier.py
+│   main.py
+│   url_extractor.py
+│   requirements.txt
+│   README.md
+│
+└────tests/
+        test_url_extractor.py
 ```
 
 ---
 
-## PIPELINE
+## 1. URL Extraction
 
-### 1. URL EXTRACTION
-- Extract all URLs from input text
-- Store URLs separately (handled elsewhere)
-- Remove URLs from text before NLP processing
-
-> (Note: URL handling is a black box for this module)
-
----
-
-### 2. TEXT PREPROCESSING
-- Input: cleaned text (URLs removed)
-- If text is empty → mark as "needs_review" and skip model
-
----
-
-### 3. ZERO-SHOT CLASSIFICATION
-
-**Model:** `facebook/bart-large-mnli`
-
-#### Task:
-Classify text into risk categories without fine-tuning
+### Function
 
 ```python
-LABELS =[
+from ai_service.url_extractor import extract_urls
+
+urls, cleaned_text = extract_urls(input_text)
+```
+
+---
+
+### Behavior
+
+* Extracts:
+
+  * `http://` and `https://` URLs
+  * `www.` links
+* Removes URLs from text
+* Cleans whitespace
+* Preserves original text structure as much as possible
+
+---
+
+### Example
+
+```python
+text = "Check this out https://example.com and www.google.com"
+
+urls, cleaned_text = extract_urls(text)
+```
+
+#### Output:
+
+```python
+urls = [
+    "https://example.com",
+    "www.google.com"
+]
+
+cleaned_text = "Check this out and"
+```
+
+---
+
+### Edge Case Handling
+
+* Trailing punctuation removed:
+
+  * `https://a.com.` → `https://a.com`
+* Handles:
+
+  * Multiple URLs
+  * Query params and fragments
+  * No URL input
+  * Large text input
+* Leaves minimal artifacts (e.g. empty brackets may remain)
+
+---
+
+### Design Notes
+
+* Stateless, pure function
+* No external dependencies
+* Fast and deterministic
+* Built using regex + positional parsing (no string replace bugs)
+
+---
+
+## 2. Text Preprocessing
+
+* Input: `cleaned_text` from extractor
+* If empty → mark as `"needs_review"` (to be implemented in classifier)
+
+---
+
+## 3. Classification (Planned)
+
+### Model
+
+```
+facebook/bart-large-mnli
+```
+
+### Labels
+
+```python
+LABELS = [
   "safe",
   "grooming",
   "sexual content",
@@ -52,23 +132,7 @@ LABELS =[
 
 ---
 
-### 4. OUTPUT
-
-#### Model returns:
-- label scores (confidence for each category)
-
-#### Post-process:
-- Select top label
-- Map to risk_score
-
->#### Example:
->grooming / sexual content / threat → HIGH
->accident / hierarchical pressure → MEDIUM
->safe → LOW
-
----
-
-### 5. FINAL OUTPUT FORMAT
+## 4. Output Format (Target)
 
 ```json
 {
@@ -76,13 +140,43 @@ LABELS =[
   "extracted_urls": [...],
   "top_label": "...",
   "confidence": 0.xx,
-  "risk_score": "LOW | MEDIUM | HIGH"
+  "risk_score": "PROBABLY PRANK | LOW | MEDIUM | HIGH | HIGHEST"
 }
 ```
 
 ---
 
-### NOTES
-- No training required (zero-shot approach)
-- Single model only (no ensemble)
-- Keep pipeline fast and explainable
+## 5. Testing
+
+Run tests:
+
+```bash
+pytest -v
+```
+
+Coverage includes:
+
+* Basic extraction
+* Edge cases
+* Large input
+* Noise handling
+* Feature validation
+
+---
+
+## Key Principles
+
+* Fast
+* Explainable
+* Minimal dependencies
+* Modular pipeline
+
+---
+
+## Next Steps
+
+* Implement classifier (`classifier.py`)
+* Integrate pipeline in `main.py`
+* Add API or service wrapper (if needed)
+
+---
