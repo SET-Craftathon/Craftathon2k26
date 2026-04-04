@@ -1,4 +1,5 @@
 const Report = require('../models/reportModel');
+const { updateReportStatusOnChain } = require("../services/blockchainService");
 
 /**
  * GET /api/admin/dashboard
@@ -117,9 +118,17 @@ const updateReportStatus = async (req, res) => {
       return res.status(404).json({ status: 'error', message: 'Report not found' });
     }
 
+      let txHash = null;
+    try {
+      txHash = await updateReportStatusOnChain(id, status);
+    } catch (err) {
+      console.error("Blockchain update error:", err.message);
+    }
+
     return res.status(200).json({
       status: 'success',
       data: updatedReport,
+      txHash,
     });
   } catch (err) {
     console.error('Update status error:', err.message);

@@ -30,4 +30,15 @@ async function storeReportOnChain(data) {
     return receipt.hash;
 }
 
-module.exports = { storeReportOnChain };
+
+async function updateReportStatusOnChain(reportId, status) {
+  const tx = await contract.updateStatus(
+    Number(reportId),
+    status
+  );
+
+  const receipt = await tx.wait();
+  return receipt.hash;
+}
+
+module.exports = { storeReportOnChain, updateReportStatusOnChain};
