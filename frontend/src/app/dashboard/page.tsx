@@ -86,7 +86,7 @@ export default function DashboardPage() {
         <div className="relative z-10 space-y-4">
           <h4 className="text-[#FF385C] font-black uppercase tracking-[0.3em] text-xs italic">Command Center Overview</h4>
           <h1 className="text-5xl md:text-6xl font-black text-[#222222] tracking-tighter leading-tight">
-            Welcome back,<br /> <span className="text-[#FF385C]">Jackson Santos</span>
+            Welcome back<br />
           </h1>
           <p className="text-gray-500 text-xl font-medium max-w-2xl leading-relaxed">
             Your intelligence network is active. We've detected <span className="text-[#222222] font-black underline underline-offset-4 decoration-[#FF385C] decoration-4">{data?.stats.pending || 0} alerts</span> that require your immediate attention.
