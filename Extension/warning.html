@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SafeGuard | Security Warning</title>
+  <style>
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .container {
+      background: #161b22;
+      border: 1px solid #ff7b72;
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 500px;
+      box-shadow: 0 0 20px rgba(255, 123, 114, 0.2);
+    }
+    h1 { color: #ff7b72; margin-bottom: 5px; }
+    h3 { color: #ffa657; margin-top: 0; }
+    p { line-height: 1.6; color: #8b949e; }
+    .url { font-family: monospace; color: #fff; background: #21262d; padding: 4px 8px; border-radius: 4px; }
+    .buttons { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
+    button {
+      padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    }
+    .btn-safe { background: #238636; color: white; }
+    .btn-safe:hover { background: #2ea043; }
+    .btn-danger { background: transparent; color: #ff7b72; border: 1px solid #ff7b72; }
+    .btn-danger:hover { background: rgba(255,123,114,0.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚠️ SECURITY WARNING ⚠️</h1>
+    <h3 id="strike-text">Strike 1 of 3</h3>
+    <p>We highly recommend you do not proceed. The following site has been flagged as potentially dangerous:</p>
+    <p class="url" id="bad-url">loading...</p>
+    <p><small>If you proceed, you do so entirely at your own risk. Upon reaching 4 strikes, this site will be permanently locked.</small></p>
+    <div class="buttons">
+      <button class="btn-safe" id="btn-back">Go Back to Safety</button>
+      <button class="btn-danger" id="btn-proceed">Proceed Anyway</button>
+    </div>
+  </div>
+  <script src="warning.js"></script>
+</body>
+</html>

@@ -7,7 +7,9 @@
     "declarativeNetRequest",
     "declarativeNetRequestWithHostAccess",
     "storage",
-    "alarms"
+    "alarms",
+    "webNavigation",
+    "tabs"
   ],
   "host_permissions": ["<all_urls>"],
   "background": {
@@ -24,7 +26,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["alert.html"],
+      "resources": ["alert.html", "warning.html", "honeypot.html"],
       "matches": ["<all_urls>"]
     }
   ],

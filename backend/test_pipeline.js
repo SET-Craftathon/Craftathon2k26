@@ -14,13 +14,13 @@ async function testPipeline(newUrlToBan) {
   try {
     console.log(`\n================================`);
     console.log(`🛡️  ADDING URL TO BLOCKLIST: ${newUrlToBan}`);
-    
+
     // Auto-extract exact clean domain even if they paste a weird URL
     let extractedDomain = newUrlToBan;
     try {
       const parsed = new URL(newUrlToBan.startsWith('http') ? newUrlToBan : `http://${newUrlToBan}`);
       extractedDomain = parsed.hostname;
-    } catch(e) {}
+    } catch (e) { }
 
     // Step A: Save to Database!
     try {
@@ -41,21 +41,25 @@ async function testPipeline(newUrlToBan) {
 
     // Step B: Fetch ALL urls from your actual collection
     const allDocs = await BannedUrl.find({});
-    // Extract just the valid domains to send to the Chrome Extension
-    const bannedDomainsArray = allDocs.map(doc => doc.domain);
+    // Extract objects with government flags for the Demo Pipeline
+    const bannedDomainsArray = allDocs.map(doc => ({
+      domain: doc.domain,
+      govApproved: false,     // Simulate the Dashboard button press
+      honeypotActive: false   // Simulate the Dashboard button press
+    }));
 
     console.log(`📊 Current DB Count: ${bannedDomainsArray.length} Banned Domains`);
 
     // Step C: Trigger the Webhook manually to simulate Chrome Extension bridge
     console.log(`\n🚀 Triggering Webhook to Bridge Server...`);
-    
+
     const response = await axios.post('http://localhost:3000/webhook', {
       urls: bannedDomainsArray
     });
 
     console.log(`⚡ Bridge Response: ${response.data}`);
     console.log(`================================\n`);
-    
+
   } catch (error) {
     console.error("❌ Pipeline Failed:", error.message);
   }
@@ -70,11 +74,11 @@ if (urlsToBan.length === 0) {
 async function runBulkTest() {
   console.log(`\n================================`);
   console.log(`🛡️  ADDING ${urlsToBan.length} URL(S) TO BLOCKLIST`);
-  
+
   for (const url of urlsToBan) {
     await testPipeline(url);
   }
-  
+
   // Close connection AFTER all loops are done
   mongoose.connection.close();
 }

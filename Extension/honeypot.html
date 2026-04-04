@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>System Error</title>
+  <style>
+    body {
+      background-color: #f0f2f5;
+      color: #333;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 20%;
+    }
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="loader"></div>
+  <h2>Connection Reset</h2>
+  <p>Please wait while your connection is being re-established...</p>
+  
+  <script src="honeypot.js"></script>
+</body>
+</html>
