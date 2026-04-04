@@ -24,7 +24,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html"],
+      "resources": ["alert.html"],
       "matches": ["<all_urls>"]
     }
   ],

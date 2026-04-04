@@ -181,6 +181,9 @@
       color: #fff;
     }
 
+    .color-red { color: #fca5a5; }
+    .color-white { color: #fff; }
+
     .footer {
       position: fixed;
       bottom: 20px;
@@ -204,40 +207,23 @@
     </div>
 
     <h1>Access <span>Blocked</span></h1>
-    <p>This website has been flagged as <strong style="color:#fca5a5">unsafe</strong> and may contain phishing, defacement, or malicious content.</p>
+    <p>This website has been flagged as <strong class="color-red">unsafe</strong> and may contain phishing, defacement, or malicious content.</p>
 
     <div class="url-box" id="flaggedUrl">Loading...</div>
 
-    <p>To protect you and others, your connection to this site has been terminated by the <strong style="color:#fff">POCSO SafeGuard Extension</strong>.</p>
+    <p>To protect you and others, your connection to this site has been terminated by the <strong class="color-white">POCSO SafeGuard Extension</strong>.</p>
 
     <div class="divider"></div>
 
     <p class="info">If you believe this is a mistake, please report it to your system administrator. This domain has been identified from a verified threat intelligence dataset.</p>
 
-    <button class="btn btn-back" onclick="goBack()">
+    <button id="backBtn" class="btn btn-back">
       ← Go Back to Safety
     </button>
   </div>
 
   <div class="footer">POCSO SafeGuard &bull; Threat Intelligence Engine v1.0</div>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const url = params.get('url') || 'Unknown site';
-    document.getElementById('flaggedUrl').textContent = url;
-    document.title = `Blocked: ${url} — POCSO SafeGuard`;
-
-    function goBack() {
-      // If there is a previous page in history, go back to it
-      if (document.referrer && document.referrer !== window.location.href) {
-        window.location.href = document.referrer;
-      } else if (history.length > 1) {
-        history.back();
-      } else {
-        // Fallback: send user to Google safely
-        window.location.href = 'https://www.google.com';
-      }
-    }
-  </script>
+  <script src="alert.js"></script>
 </body>
 </html>
