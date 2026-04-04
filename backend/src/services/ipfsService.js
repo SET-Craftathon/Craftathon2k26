@@ -6,9 +6,13 @@ const PINATA_API_KEY = process.env.PINATA_API_KEY;
 const PINATA_SECRET_API_KEY = process.env.PINATA_SECRET_API_KEY;
 
 // 📦 Upload File (unchanged)
-async function uploadToIPFS(filePath) {
+async function uploadToIPFS(filePathOrBuffer, originalname = "evidence.jpg") {
   const data = new FormData();
-  data.append("file", fs.createReadStream(filePath));
+  if (Buffer.isBuffer(filePathOrBuffer)) {
+    data.append("file", filePathOrBuffer, { filename: originalname });
+  } else {
+    data.append("file", fs.createReadStream(filePathOrBuffer));
+  }
 
   const res = await axios.post(
     "https://api.pinata.cloud/pinning/pinFileToIPFS",

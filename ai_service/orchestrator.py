@@ -39,6 +39,8 @@ def _normalize(result: Any) -> Dict[str, Any]:
     """
     if result is None:
         return None
+    if isinstance(result, str):
+        return {"text": result}
     if isinstance(result, dict):
         return result
     if is_dataclass(result) and not isinstance(result, type):
@@ -59,6 +61,30 @@ def _safe_call(func, *args, name="") -> Dict[str, Any]:
 
 
 def _compute_risk_score(
+    nlp: Optional[Dict[str, Any]],
+    nsfw: Optional[Dict[str, Any]],
+    clip: Optional[Dict[str, Any]],
+) -> float:
+    score = 0.0
+
+    if nsfw and not nsfw.get("error") and nsfw.get("is_nsfw"):
+        score = max(score, 1.0)
+
+    if nlp and not nlp.get("error"):
+        confidence = nlp.get("confidence", 0)
+        if confidence > 0.8:
+            score = max(score, 0.75 + 0.25 * (confidence - 0.8) / 0.2)
+
+    if clip and not clip.get("error"):
+        violent_labels = {"weapon", "gore", "violent_scene"}
+        if clip.get("label") in violent_labels:
+            confidence = clip.get("confidence", 0)
+            if confidence > 0.7:
+                score = max(score, 0.5 + 0.25 * (confidence - 0.7) / 0.3)
+
+    return round(score, 4)
+
+def _compute_risk_severity(
     nlp: Optional[Dict[str, Any]],
     nsfw: Optional[Dict[str, Any]],
     clip: Optional[Dict[str, Any]],
@@ -117,11 +143,14 @@ def analyze_input(text: str, image: Optional[Any] = None) -> Dict[str, Any]:
         ocr_result = _safe_call(extract_text, image, name="ocr")
 
     final_risk_score = _compute_risk_score(nlp_result, nsfw_result, clip_result)
+    final_risk_severity = _compute_risk_severity(nlp_result, nsfw_result, clip_result)
 
     return {
-        "cleaned_text": cleaned_text,
+        "cleaned_text": text,
         "extracted_urls": extracted_urls,
-        "final_risk_score": final_risk_score,
+        "ai_confidence": final_risk_score,
+        "severity" : final_risk_severity,
+        "content_type": nlp_result["top_label"],
         "nlp": nlp_result,
         "nsfw": nsfw_result,
         "clip": clip_result,

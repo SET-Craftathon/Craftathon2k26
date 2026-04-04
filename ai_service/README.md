@@ -171,3 +171,22 @@ curl -s -X POST http://localhost:8000/classify -H "Content-Type: application/jso
 │   │       3.jpg
 │   │       4.jpg
 ```
+
+What we need:
+
+```javascript
+const savedReport = await Report.create({
+    // reportId: String(finalResponse.reportId),
+    severity: finalResponse.severity,
+    // referenceURL: finalResponse.referenceURL || "",
+    description: finalResponse.discription || finalResponse.description || "",
+    contentType: finalResponse.contentType,
+    aiConfidence: finalResponse.aiConfidence,
+    // evidenceCID: finalResponse.evidenceCID,
+    // status: finalResponse.status,
+    // evidenceCount: finalResponse.evidenceCount,
+    // evidenceURL: finalResponse.evidenceURL,
+    // reportCID: finalResponse.reportCID,
+    // txHash: finalResponse.txHash,
+});
+```

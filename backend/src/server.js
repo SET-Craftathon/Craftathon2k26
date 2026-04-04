@@ -30,6 +30,7 @@ const reportRoutes = require("./routes/reportRoutes");
 
 // Routes
 app.use('/api', healthRoutes);
+app.use('/api', reportGenerate);
 app.use("/api/upload", reportRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/admin/dashboard', dashboardRoutes);
