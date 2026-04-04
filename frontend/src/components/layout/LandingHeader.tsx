@@ -1,45 +1,77 @@
 'use client';
 import Link from 'next/link';
-import { Shield, Menu, User, Globe, Search } from 'lucide-react';
+import { Shield, ShieldAlert, Landmark, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import clsx from 'clsx';
+import { useState } from 'react';
 
 export default function LandingHeader() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' },
+  ];
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-6 md:p-8 pointer-events-none">
-      <header className="pointer-events-auto w-full max-w-6xl h-16 md:h-20 bg-white/70 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] rounded-full px-6 md:px-10 flex items-center justify-between transition-all hover:shadow-[0_12px_48px_rgba(0,0,0,0.12)]">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-[#FF385C] rounded-full flex items-center justify-center text-white transition-all group-hover:rotate-12 shadow-lg shadow-[#FF385C]/20">
-            <Shield size={22} fill="currentColor" />
+    <>
+      <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 z-50 shadow-sm shrink-0 relative">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="relative flex items-center justify-center w-10 h-10 bg-blue-900 rounded-lg shrink-0">
+            <ShieldAlert size={26} className="text-blue-300" />
+            <Landmark size={12} className="text-white absolute mt-0.5" />
           </div>
-          <span className="text-[#222222] text-xl font-black tracking-tighter hidden sm:block">security</span>
+          <div className="flex flex-col">
+            <span className="font-bold tracking-wide text-lg leading-tight text-gray-900">GovPortal</span>
+            <span className="text-[10px] text-blue-600 font-bold tracking-widest uppercase">Public Sector</span>
+          </div>
         </Link>
 
-        {/* Center Nav - Floating Pill style */}
-        <nav className="hidden lg:flex items-center gap-10 text-sm font-black text-[#222222] uppercase tracking-widest">
-          <Link href="/about" className={clsx(
-            "hover:text-[#FF385C] transition-colors relative group",
-            pathname === '/about' && "text-[#FF385C]"
-          )}>
-            About Us
-            <span className={clsx("absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF385C] transition-all group-hover:w-full", pathname === '/about' && "w-full")} />
-          </Link>
-          <Link href="/contact" className={clsx(
-            "hover:text-[#FF385C] transition-colors relative group",
-            pathname === '/contact' && "text-[#FF385C]"
-          )}>
-            Contact
-            <span className={clsx("absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF385C] transition-all group-hover:w-full", pathname === '/contact' && "w-full")} />
-          </Link>
+        <nav className="hidden md:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                pathname === link.href
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
-        {/* Right Actions - Empty now as requested */}
-        <div className="flex items-center gap-6" />
+        <div className="flex items-center">
+          <button
+            onClick={() => setMobileOpen((p) => !p)}
+            className="md:hidden p-2 text-gray-400 hover:text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+          {/* No visible login — single government admin accesses /login directly */}
+          <div className="hidden md:block w-0" />
+        </div>
       </header>
-    </div>
 
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 shadow-sm px-4 py-3 space-y-1 z-40">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                pathname === link.href ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </>
   );
 }

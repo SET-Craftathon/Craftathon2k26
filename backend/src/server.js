@@ -48,6 +48,7 @@ app.use((req, res, next) => {
 });
 
 const reportRoutes = require("./routes/reportRoutes");
+const chatRoutes = require("./routes/chat.route");
 
 // Routes
 app.use('/api', healthRoutes);
@@ -55,6 +56,7 @@ app.use('/api', reportGenerate);
 app.use("/api/upload", reportRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/admin/dashboard', dashboardRoutes);
+app.use('/api/admin/chat', chatRoutes);
 
 app.get("/debug", (req, res) => {
     res.json({

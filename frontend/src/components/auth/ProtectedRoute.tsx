@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/useAppStore';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { token, isAuthenticated, logout } = useAppStore();
+  const { token, isAuthenticated, logout, hasHydrated } = useAppStore();
   const [isVerifying, setIsVerifying] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -18,6 +18,9 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     if (!mounted) return;
 
     const verifyAuth = async () => {
+      // Wait for hydration before checking auth
+      if (!hasHydrated) return;
+
       // For any route this wraps, protect it
       if (!isAuthenticated || !token) {
         if (isAuthenticated) {
@@ -51,7 +54,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     };
 
     verifyAuth();
-  }, [mounted, isAuthenticated, token, router, logout]);
+  }, [mounted, isAuthenticated, token, router, logout, hasHydrated]);
 
   if (!mounted || isVerifying) {
     return (

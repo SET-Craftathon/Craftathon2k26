@@ -2,17 +2,28 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Filter, Search, Clock, CheckCircle } from 'lucide-react';
+import { Shield, Filter, Search, Clock, CheckCircle2, ShieldAlert, Eye, MoreVertical, Hash, Activity, FileText, ChevronRight } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import ReportModal, { ReportData } from './ReportModal';
 import clsx from 'clsx';
 
+const Badge = ({ severity, status }: { severity?: string, status?: string }) => {
+  if (status === 'RESOLVED') {
+    return <span className="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200">Resolved</span>;
+  }
+  
+  if (severity === 'HIGHEST' || severity === 'HIGH') {
+    return <span className="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border bg-rose-100 text-rose-800 border-rose-200">High Priority</span>;
+  }
+  
+  return <span className="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border bg-amber-100 text-amber-800 border-amber-200">Pending Review</span>;
+};
 
 export default function ThreadsView() {
   const { token, tableSearch } = useAppStore();
   const [reports, setReports] = useState<ReportData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState<string>('ALL');
+  const [filterSeverity, setFilterSeverity] = useState<string>('ALL');
   const [selectedReport, setSelectedReport] = useState<ReportData | null>(null);
 
   useEffect(() => {
@@ -36,152 +47,130 @@ export default function ThreadsView() {
     if (token) fetchReports();
   }, [token]);
 
-  const contentTypes = useMemo(() => {
-    const types = new Set(reports.map(r => r.contentType));
-    return ['ALL', ...Array.from(types)];
-  }, [reports]);
+  const severityLevels = ['ALL', 'LOW', 'MEDIUM', 'HIGH', 'HIGHEST'];
 
   const filteredReports = useMemo(() => {
     return reports.filter(r => {
-      const matchesType = filterType === 'ALL' || r.contentType === filterType;
+      const matchesSeverity = filterSeverity === 'ALL' || r.severity === filterSeverity;
       const matchesSearch = !tableSearch || 
         r.reportId.toLowerCase().includes(tableSearch.toLowerCase()) ||
         r.contentType.toLowerCase().includes(tableSearch.toLowerCase()) ||
         (r.description && r.description.toLowerCase().includes(tableSearch.toLowerCase()));
-      return matchesType && matchesSearch;
+      return matchesSeverity && matchesSearch;
     });
-  }, [reports, filterType, tableSearch]);
-
-
-  const getSeverityBadge = (sev: string) => {
-    const styles: Record<string, string> = {
-      'HIGHEST': 'bg-[#FF385C] text-white border-[#FF385C]',
-      'HIGH': 'bg-[#FC642D] text-white border-[#FC642D]',
-      'MEDIUM': 'bg-[#717171] text-white border-[#717171]',
-      'LOW': 'bg-[#00A699] text-white border-[#00A699]',
-    };
-    const style = styles[sev] || 'bg-gray-200 text-gray-700 border-gray-200';
-    return (
-      <span className={clsx('text-[9px] font-black px-3 py-1.5 rounded-full border uppercase tracking-[0.2em] shadow-sm', style)}>
-        {sev}
-      </span>
-    );
-  };
+  }, [reports, filterSeverity, tableSearch]);
 
   if (loading) {
     return (
-      <div className="w-full h-96 flex items-center justify-center">
-         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#FF385C]"></div>
+      <div className="grid grid-cols-1 gap-4">
+        {Array(5).fill(0).map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 animate-pulse rounded-xl border border-gray-200" />
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header and Filter */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20 text-gray-800">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h4 className="text-[#FF385C] font-black uppercase tracking-[0.3em] text-xs mb-4 italic">Intelligence Repository</h4>
-          <h1 className="text-5xl font-black text-[#222222] tracking-tighter leading-none">
-            Threat Landscape
-          </h1>
-          <p className="text-gray-500 font-medium mt-4 text-lg">Detailed analysis of verified and pending security reports.</p>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Active Reports</h2>
+          <p className="mt-1 text-sm text-gray-500">Comprehensive log of all citizen-submitted incident reports.</p>
         </div>
 
-        <div className="flex items-center gap-4 w-full lg:w-auto">
-          <div className="relative flex-1 lg:w-80 group">
-            <Filter size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#FF385C] transition-colors" />
+        <div className="flex items-center gap-4">
+          <div className="relative hidden md:block">
+             <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-full flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-semibold text-emerald-700 tracking-wider">Live Sync</span>
+             </div>
+          </div>
+          <div className="relative">
             <select 
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="w-full bg-white border-2 border-gray-100 rounded-[20px] py-4 pl-14 pr-12 text-sm font-black text-[#222222] focus:ring-4 focus:ring-[#FF385C]/5 focus:border-[#FF385C]/20 shadow-sm transition-all appearance-none outline-none cursor-pointer"
+              value={filterSeverity}
+              onChange={(e) => setFilterSeverity(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer shadow-sm"
             >
-              {contentTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type === 'ALL' ? 'Everything' : type}
-                </option>
+              {severityLevels.map(level => (
+                <option key={level} value={level}>{level === 'ALL' ? 'Filter by Priority' : `${level} Priority`}</option>
               ))}
             </select>
+            <Filter className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
       </div>
 
-      {/* Grid */}
-      {filteredReports.length === 0 ? (
-        <div className="bg-white p-24 rounded-[48px] text-center flex flex-col items-center justify-center border-2 border-dashed border-gray-100">
-          <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-8">
-             <Search className="w-12 h-12 text-gray-200" />
-          </div>
-          <h3 className="text-3xl font-black text-[#222222] mb-3">No matching threats</h3>
-          <p className="text-gray-500 font-medium max-w-sm text-lg">Try adjusting your filters or search criteria to find specific reports.</p>
+      {/* Data Density Grid */}
+      <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center">
+            <span className="text-sm font-semibold text-gray-600">Showing {filteredReports.length} results</span>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-          {filteredReports.map((report, index) => (
+        
+        <div className="divide-y divide-gray-200">
+          {filteredReports.map((report) => (
             <motion.div
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               key={report.reportId}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
+              className="group bg-white hover:bg-gray-50 p-4 sm:p-6 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center gap-4 sm:gap-6"
               onClick={() => setSelectedReport(report)}
-              className="group cursor-pointer"
             >
-              <div className="relative aspect-[4/3] w-full mb-6 overflow-hidden rounded-[40px] bg-gray-100 shadow-lg shadow-gray-200/50">
-                 {/* Visual Header */}
-                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900/60 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                 <img 
-                   src={`https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800`} 
-                   alt="Threat" 
-                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                 />
-                 <div className="absolute top-6 right-6 z-20">
-                   {getSeverityBadge(report.severity)}
-                 </div>
-                 <div className="absolute bottom-6 left-6 z-20 opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0">
-                    <button className="bg-white text-[#222222] px-6 py-2.5 rounded-2xl font-black text-sm shadow-xl">
-                       Open Details
-                    </button>
-                 </div>
+              <div className="flex items-center gap-4 flex-1 min-w-0">
+                <div className={clsx(
+                  "w-12 h-12 rounded-full flex items-center justify-center shrink-0 border",
+                  report.status === 'RESOLVED' 
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                    : report.severity === 'HIGHEST' || report.severity === 'HIGH'
+                    ? "bg-rose-50 border-rose-100 text-rose-600"
+                    : "bg-amber-50 border-amber-100 text-amber-600"
+                )}>
+                  {report.status === 'RESOLVED' ? <CheckCircle2 size={24} /> : <ShieldAlert size={24} />}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center flex-wrap gap-2 mb-1">
+                      <span className="text-sm font-semibold text-blue-900">
+                        {report.reportId.slice(0, 15).toUpperCase()}...
+                      </span>
+                      <Badge severity={report.severity} status={report.status} />
+                    </div>
+                    <h3 className="text-base font-medium text-gray-900 truncate mb-1">
+                      {report.contentType}
+                    </h3>
+                    <p className="text-sm text-gray-500 truncate max-w-2xl">
+                      {report.description || "No description provided."}
+                    </p>
+                </div>
               </div>
-              
-              <div className="space-y-3 px-2">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-black text-[#222222] group-hover:text-[#FF385C] transition-colors tracking-tight italic truncate pr-4">
-                    {report.contentType}
-                  </h3>
 
-                  <div className="flex items-center gap-1.5">
-                     <Clock size={14} className="text-gray-400" />
-                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
-                        {report.reportId.slice(-6)}
-                     </span>
+              <div className="flex items-center justify-between md:justify-end gap-6 shrink-0 md:pl-6 md:border-l border-gray-100">
+                  <div className="flex flex-col items-start md:items-end">
+                      <span className="text-xs text-gray-400 font-medium tracking-wide uppercase mb-1">Date Logged</span>
+                      <div className="flex items-center text-sm font-medium text-gray-900">
+                        <Clock size={14} className="mr-1.5 text-gray-400" />
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </div>
                   </div>
-                </div>
-                
-                <p className="text-base text-gray-500 font-medium line-clamp-2 leading-relaxed break-all">
-                  {report.description || "System generated alert for potential threat patterns detected in real-time streams."}
-                </p>
-
-                <div className="flex items-center justify-between pt-4">
-                  <div className="flex items-center gap-2">
-                    <div className={clsx(
-                      'w-2.5 h-2.5 rounded-full ring-4 ring-offset-2',
-                      report.status === 'PENDING' ? 'bg-[#FC642D] ring-[#FC642D]/10' : 'bg-[#00A699] ring-[#00A699]/10'
-                    )} />
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none ml-1">{report.status}</span>
+                  
+                  <div className="text-blue-600 hover:text-blue-800 flex items-center opacity-0 group-hover:opacity-100 transition-opacity font-medium text-sm pr-2">
+                    Review <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
-                  <div className="flex items-center -space-x-3 group-hover:-space-x-1 transition-all">
-                     {[1,2,3].map(i => (
-                       <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-200" />
-                     ))}
-                  </div>
-                </div>
               </div>
             </motion.div>
           ))}
         </div>
-      )}
 
+        {filteredReports.length === 0 && (
+          <div className="py-24 text-center">
+             <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+             <h3 className="text-lg font-medium text-gray-900 mb-1">No reports found</h3>
+             <p className="text-gray-500 text-sm">No active reports match your current filters.</p>
+          </div>
+        )}
+      </div>
 
       {selectedReport && (
         <ReportModal 

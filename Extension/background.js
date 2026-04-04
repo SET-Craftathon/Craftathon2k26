@@ -25,7 +25,7 @@ function isWhitelisted(domain) {
 let pingInterval;
 
 function connectToBridge() {
-  const ws = new WebSocket('ws://localhost:3000');
+  const ws = new WebSocket('ws://localhost:3001');
   
   ws.onopen = () => {
     console.log('[SafeGuard] 🔗 Connected to Real-Time Bridge');

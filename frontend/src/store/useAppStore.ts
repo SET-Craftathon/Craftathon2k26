@@ -15,8 +15,8 @@ interface AppState {
   logout: () => void;
 
   // Tabs
-  activeTab: 'dashboard' | 'threads';
-  setActiveTab: (tab: 'dashboard' | 'threads') => void;
+  activeTab: 'dashboard' | 'threads' | 'chat';
+  setActiveTab: (tab: 'dashboard' | 'threads' | 'chat') => void;
 
   // Theme
   theme: 'dark' | 'light';
@@ -45,6 +45,9 @@ interface AppState {
   // Audio
   audioEnabled: boolean;
   toggleAudio: () => void;
+  // Hydration
+  hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
 }
 
 // Cookie Utilities
@@ -111,6 +114,8 @@ export const useAppStore = create<AppState>()(
 
       audioEnabled: false,
       toggleAudio: () => set((s) => ({ audioEnabled: !s.audioEnabled })),
+      hasHydrated: false,
+      setHasHydrated: (v) => set({ hasHydrated: v }),
     }),
     {
       name: 'scc-store',
@@ -120,8 +125,11 @@ export const useAppStore = create<AppState>()(
         audioEnabled: state.audioEnabled,
         admin: state.admin,
         isAuthenticated: state.isAuthenticated,
-        // Removed token from persist, now handled by cookies
+        token: state.token, // Preserve token on refresh
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

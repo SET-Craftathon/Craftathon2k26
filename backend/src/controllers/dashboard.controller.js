@@ -139,4 +139,30 @@ const updateReportStatus = async (req, res) => {
   }
 };
 
-module.exports = { getDashboardData, getAllReports, updateReportStatus };
+/**
+ * GET /api/admin/dashboard/reports/:id
+ * Returns a specific report by its numeric reportId
+ */
+const getReportById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await Report.findOne({ reportId: id });
+    
+    if (!report) {
+      return res.status(404).json({ status: 'error', message: 'Report not found' });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: report,
+    });
+  } catch (err) {
+    console.error('Fetch report by id error:', err.message);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch report details.',
+    });
+  }
+};
+
+module.exports = { getDashboardData, getAllReports, updateReportStatus, getReportById };

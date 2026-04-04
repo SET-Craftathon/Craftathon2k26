@@ -1,395 +1,282 @@
 'use client';
 import { useRef, useState } from 'react';
-
-import { 
-  Shield, Search, Globe, Zap, Lock, BarChart3, 
-  ArrowRight, CheckCircle2, CloudUpload, Eye, 
-  Activity, Users, Database, Server, Smartphone, 
-  Laptop, Network
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import clsx from 'clsx';
+import { ShieldAlert, Globe, CloudUpload, CheckCircle2, FileText, Shield, Eye, Lock, Zap, AlertTriangle, ArrowRight, Database, Cpu, Network, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function RootPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [formData, setFormData] = useState<{
-    targetUrl: string;
-    description: string;
-    imageFile: File | null;
-  }>({
-    targetUrl: '',
-    description: '',
-    imageFile: null
-  });
-
+  const [formData, setFormData] = useState({ targetUrl: '', description: '', imageFiles: [] as File[] });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!formData.description) {
-      alert("Please provide a description of the threat.");
-      return;
-    }
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.description) { alert("Please provide a description."); return; }
     try {
       setLoading(true);
       const data = new FormData();
       data.append('description', formData.description);
-      if (formData.targetUrl) {
-        data.append('url', formData.targetUrl);
+      if (formData.targetUrl) data.append('url', formData.targetUrl);
+      if (formData.imageFiles && formData.imageFiles.length > 0) {
+        formData.imageFiles.forEach((file) => data.append('image', file));
       }
-      if (formData.imageFile) {
-        data.append('image', formData.imageFile);
-      }
-
-      const res = await fetch('http://localhost:5000/api/report', {
-        method: 'POST',
-        body: data,
-      });
-
-      if (!res.ok) {
-         throw new Error(`Failed with status ${res.status}`);
-      }
-
-      const result = await res.json();
-      console.log('Report submitted successfully:', result);
+      const res = await fetch('http://localhost:5000/api/report', { method: 'POST', body: data });
+      if (!res.ok) throw new Error(`Failed with status ${res.status}`);
       setSuccess(true);
-      
-      // Reset form
-      setFormData({ targetUrl: '', description: '', imageFile: null });
-      setTimeout(() => setSuccess(false), 3000);
-      
-    } catch (err) {
-      console.error('Error submitting report:', err);
-      alert('Failed to submit report.');
-    } finally {
-      setLoading(false);
-    }
+      setFormData({ targetUrl: '', description: '', imageFiles: [] });
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (err) { console.error(err); alert('Failed to submit report.'); }
+    finally { setLoading(false); }
   };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, imageFile: e.target.files![0] }));
-    }
-  };
-
-  const categories = [
-    { name: 'Phishing', icon: Shield, color: 'text-red-500', bg: 'bg-red-50' },
-    { name: 'Malware', icon: Zap, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { name: 'Scam', icon: Lock, color: 'text-pink-500', bg: 'bg-pink-50' },
-    { name: 'Botnet', icon: BarChart3, color: 'text-blue-500', bg: 'bg-blue-50' },
-  ];
 
   return (
-    <div className="w-full bg-white selection:bg-[#FF385C] selection:text-white">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-40 px-6 md:px-20 overflow-hidden">
-        {/* Background Decorative Elements */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#FFF1F2] rounded-full blur-[140px] -pt-40 -mr-40 opacity-40 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#F0FDFA] rounded-full blur-[120px] -mb-40 -ml-40 opacity-40 pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFF1F2] rounded-full text-[#FF385C] text-xs font-black uppercase tracking-widest mb-8"
-          >
-            <Activity size={14} />
-            <span>50,000+ Threats Neutralized This Week</span>
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-8xl font-black text-[#222222] tracking-tighter mb-8 leading-[0.9] md:leading-[0.85]"
-          >
-            Digital Safety.<br /><span className="text-[#FF385C]">Built by Humans.</span>
-          </motion.h1>
-          <motion.p 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.1 }}
-             className="text-xl md:text-2xl text-gray-500 font-medium max-w-3xl mx-auto mb-16 leading-relaxed"
-          >
-            The world's first decentralised threat intelligence network. Report malicious links, upload evidence, and secure the web for everyone.
-          </motion.p>
-        </div>
+    <div className="w-full min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {/* Redesigned 2-Tier Search/Report Bar */}
-        <div className="max-w-5xl mx-auto relative z-10 px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white/80 backdrop-blur-xl border border-gray-200 rounded-[48px] shadow-2xl hover:shadow-[0_32px_64px_rgba(0,0,0,0.12)] transition-all p-4 space-y-2"
-          >
-            {/* Top Row: URL and File side by side */}
-            <div className="flex flex-col md:flex-row gap-2">
-              {/* Target Link */}
-              <div className="flex-[2.5] px-10 py-6 bg-gray-50/50 hover:bg-white hover:shadow-inner rounded-[32px] transition-all cursor-text group overflow-hidden border border-transparent hover:border-gray-100">
-                <label className="block text-[10px] font-black text-[#222222]/40 uppercase tracking-[0.2em] mb-2 group-hover:text-[#FF385C] transition-colors text-left pl-3">Target URL</label>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-gray-300 group-hover:text-[#FF385C] transition-colors shadow-sm">
-                    <Globe size={18} />
-                  </div>
-                  <input 
-                    type="text" 
-                    placeholder="https://malicious-site.com" 
-                    className="w-full bg-transparent border-none focus:ring-0 p-0 text-lg placeholder-gray-300 font-black text-[#222222] outline-none"
-                    value={formData.targetUrl}
-                    onChange={(e) => handleInputChange('targetUrl', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* File Upload */}
-              <div 
-                onClick={() => fileInputRef.current?.click()}
-                className="flex-1 px-10 py-6 bg-gray-50/50 hover:bg-white hover:shadow-inner rounded-[32px] transition-all cursor-pointer group overflow-hidden border border-transparent hover:border-gray-100"
-              >
-                <label className="block text-[10px] font-black text-[#222222]/40 uppercase tracking-[0.2em] mb-2 group-hover:text-[#FF385C] transition-colors text-left pl-3">Evidence</label>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-gray-300 group-hover:text-[#FF385C] transition-colors shadow-sm">
-                    <CloudUpload size={18} />
-                  </div>
-                  <div className="flex flex-col text-left">
-                     <span className="text-sm font-black text-[#222222] truncate max-w-[120px]">
-                        {formData.imageFile ? formData.imageFile.name : 'Upload Image'}
-                     </span>
-                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">
-                        {formData.imageFile ? `${(formData.imageFile.size / 1024 / 1024).toFixed(2)} MB` : 'JPG, PNG or PDF'}
-                     </span>
-                  </div>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={handleFileChange}
-                    accept="image/*,.pdf"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Row */}
-            <div className="flex flex-col md:flex-row gap-2">
-              <div className="flex-1 px-10 py-8 bg-gray-50/50 hover:bg-white hover:shadow-inner rounded-[32px] transition-all cursor-text group relative border border-transparent hover:border-gray-100">
-                <label className="block text-[10px] font-black text-[#222222]/40 uppercase tracking-[0.2em] mb-2 group-hover:text-[#FF385C] transition-colors text-left pl-3">Describe Active Threat</label>
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-300 group-hover:text-[#FF385C] transition-colors shadow-sm shrink-0">
-                    <Zap size={22} />
-                  </div>
-                  <input 
-                    type="text" 
-                    placeholder="Tell us what you saw... (e.g. Unusual login request, fake giveaway, suspicious download)" 
-                    className="w-full bg-transparent border-none focus:ring-0 p-0 text-lg placeholder-gray-300 font-black text-[#222222] outline-none"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                  />
-                </div>
-                
-                <button 
-                  className={clsx(
-                    "absolute right-4 top-1/2 -translate-y-1/2 text-white w-20 h-20 rounded-[28px] flex items-center justify-center transition-all shadow-2xl active:scale-95 group/btn",
-                    success ? "bg-emerald-500 shadow-emerald-500/30" : "bg-[#FF385C] hover:bg-[#D70466] shadow-[#FF385C]/30",
-                    loading && "opacity-80 pointer-events-none"
-                  )}
-                  onClick={handleSubmit}
-                  disabled={loading}
-                >
-                  {loading ? (
-                     <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : success ? (
-                     <CheckCircle2 size={32} strokeWidth={3} className="text-white" />
-                  ) : (
-                     <ArrowRight size={32} strokeWidth={3} className="group-hover/btn:scale-110 transition-transform" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="bg-gray-50 py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-20 grid grid-cols-2 md:grid-cols-4 gap-12 text-center relative z-10">
-           {[
-             { label: 'Verified Threats', value: '8.2M+', icon: Shield },
-             { label: 'Active Analysts', value: '42K', icon: Users },
-             { label: 'Response Time', value: '1.2s', icon: Zap },
-             { label: 'Secured Nodes', value: '1500+', icon: Network }
-           ].map((stat, i) => (
-             <div key={i} className="space-y-4">
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto text-[#FF385C] shadow-sm">
-                  <stat.icon size={24} />
+        {/* ─── Welcome Banner ─── */}
+        <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col-reverse lg:flex-row items-center gap-8">
+              <div className="flex-1 flex items-start gap-4">
+                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-800 shrink-0">
+                  <Shield className="w-6 h-6" />
                 </div>
                 <div>
-                   <h3 className="text-4xl font-black text-[#222222] italic leading-none mb-2">{stat.value}</h3>
-                   <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
+                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    GovPortal — Citizen Threat Reporting System
+                  </h1>
+                  <p className="mt-2 text-sm text-gray-600 leading-relaxed max-w-2xl">
+                    GovPortal is a public service initiative that enables citizens of India to report online threats such as phishing websites, scam messages, malware distribution, and cyber fraud. Every report you submit is automatically analysed by our AI engine, verified for authenticity, and stored on an immutable blockchain ledger — ensuring no evidence can be tampered with or deleted.
+                  </p>
+                  <p className="mt-2 text-sm text-gray-500 leading-relaxed max-w-2xl">
+                    Your reports help government agencies like <strong className="text-gray-700">CERT-In</strong> track emerging cyber threats in real-time and take faster action to protect millions of internet users across the country.
+                  </p>
                 </div>
-             </div>
-           ))}
-        </div>
-      </section>
-
-      {/* Categories / Live Feed */}
-      <section className="px-6 md:px-20 py-40">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-24">
-            <h4 className="text-[#FF385C] font-black uppercase tracking-[0.3em] text-xs mb-4 italic">Surveillance</h4>
-            <h2 className="text-5xl md:text-6xl font-black text-[#222222] tracking-tighter leading-none mb-6">
-              Active Hunting Grounds
-            </h2>
-            <p className="text-gray-500 font-medium text-xl max-w-2xl mx-auto">
-              Our network actively monitors and neutralizes threats across these major digital vectors.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {categories.map((cat, i) => (
-              <motion.div 
-                key={i}
-                whileHover={{ y: -12 }}
-                className="bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm hover:shadow-2xl transition-all cursor-pointer group"
-              >
-                <div className={clsx("w-16 h-16 rounded-3xl flex items-center justify-center mb-8 transition-all group-hover:scale-110", cat.bg, cat.color)}>
-                   <cat.icon size={32} />
-                </div>
-                <h3 className="text-2xl font-black text-[#222222] mb-4 tracking-tight italic">{cat.name}</h3>
-                <p className="text-gray-500 font-medium text-base leading-relaxed mb-8">Detecting and neutralising malicious {cat.name.toLowerCase()} campaigns across decentralized networks.</p>
-                <div className="h-1.5 w-12 bg-gray-100 rounded-full group-hover:w-full group-hover:bg-[#FF385C] transition-all duration-500" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Deep Dive */}
-      <section className="px-6 md:px-20 py-40 bg-[#222222] rounded-[100px] mx-6 md:mx-12 overflow-hidden relative">
-         <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
-            <div className="absolute inset-0 bg-white" style={{ maskImage: 'radial-gradient(circle, #000 1px, transparent 1px)', maskSize: '40px 40px' }} />
-         </div>
-
-         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center relative z-10">
-            <div className="space-y-12">
-               <div>
-                 <h4 className="text-[#FF385C] font-black uppercase tracking-[0.3em] text-sm mb-6">Core Technology</h4>
-                 <h2 className="text-6xl font-black text-white leading-[0.9] tracking-tighter">
-                   Blockchain Integrity.<br />
-                   AI Intelligence.
-                 </h2>
-               </div>
-               
-               <div className="space-y-10">
-                  {[
-                    { title: 'Semantic Verification', desc: 'Our AI models understand the "intent" of a site, not just the code.', icon: Eye },
-                    { title: 'Immutable Proof', desc: 'Threat evidence is hash-logged on decentralized ledgers for total auditability.', icon: Lock },
-                    { title: 'Latency-Free Protection', desc: 'Secure APIs provide real-time filtering for multi-million user products.', icon: Zap }
-                  ].map((feat, i) => (
-                    <div key={i} className="flex gap-8 group">
-                       <div className="w-16 h-16 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0 group-hover:bg-[#FF385C] group-hover:border-[#FF385C] transition-all">
-                          <feat.icon size={26} />
-                       </div>
-                       <div>
-                         <h5 className="text-xl font-black text-white mb-2">{feat.title}</h5>
-                         <p className="text-gray-400 font-medium leading-relaxed">{feat.desc}</p>
-                       </div>
-                    </div>
-                  ))}
-               </div>
+              </div>
+              <div className="w-full lg:w-1/3 relative h-[250px] lg:h-[200px] shrink-0 rounded-lg overflow-hidden border border-gray-100 shadow-sm bg-blue-50 flex items-center justify-center">
+                <Image src="/hero.png" alt="GovPortal Cyber Security" fill style={{ objectFit: 'cover' }} className="rounded-lg opacity-90" />
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div className="relative">
-               <motion.div 
-                 animate={{ y: [0, -20, 0] }}
-                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                 className="relative bg-white/10 backdrop-blur-2xl border border-white/20 p-12 rounded-[64px] shadow-2xl"
-               >
-                  <div className="aspect-square bg-gradient-to-br from-[#FF385C] to-[#D70466] rounded-[48px] flex items-center justify-center shadow-inner overflow-hidden relative">
-                     <Shield size={200} className="text-white/20 absolute -bottom-20 -right-20" strokeWidth={1} />
-                     <div className="relative z-10 text-center space-y-6 px-10">
-                        <div className="w-24 h-24 bg-white rounded-[32px] flex items-center justify-center mx-auto text-[#FF385C] shadow-2xl">
-                           <Network size={48} />
-                        </div>
-                        <p className="text-white font-black text-3xl tracking-tighter italic leading-none">Global Defense Consensus</p>
-                        <p className="text-white/60 font-medium text-lg leading-relaxed">Securing 1.2M+ active endpoints every second through trustless verification.</p>
-                     </div>
+        {/* ─── Report Form + Info Sidebar ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <FileText className="w-5 h-5 mr-2 text-gray-400" />
+                  Submit a New Report
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">Provide as much detail as possible. Your identity is never shared publicly.</p>
+              </div>
+              <form className="p-6 space-y-5" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Suspicious URL <span className="text-gray-400 font-normal">(if applicable)</span></label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><Globe className="w-4 h-4" /></span>
+                      <input type="text" className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" placeholder="https://example-scam-site.com" value={formData.targetUrl} onChange={(e) => setFormData(p => ({ ...p, targetUrl: e.target.value }))} />
+                    </div>
                   </div>
-               </motion.div>
-            </div>
-         </div>
-      </section>
-
-      {/* How it Works - Steps */}
-      <section className="px-6 md:px-20 py-48">
-         <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col lg:flex-row justify-between items-end gap-12 mb-32">
-               <div className="max-w-2xl">
-                 <h4 className="text-[#FF385C] font-black uppercase tracking-[0.3em] text-xs mb-4 italic">Protocol Flow</h4>
-                 <h2 className="text-5xl md:text-7xl font-black text-[#222222] tracking-tighter leading-none mb-6">
-                   From Flag to Secure in Seconds.
-                 </h2>
-               </div>
-               <p className="text-gray-500 font-medium text-xl max-w-sm mb-4 leading-relaxed">
-                 Our three-step verification process ensures high accuracy and global distribution.
-               </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-20">
-               {[
-                 { step: '01', title: 'Community Flagging', desc: 'Any user or analyst flags a suspicious link or behavior with evidence.', icon: Shield },
-                 { step: '02', title: 'AI & Peer Review', desc: 'Network nodes verify the report using multi-modal AI and manual audit.', icon: Eye },
-                 { step: '03', title: 'Global Settlement', desc: 'The threat is hashed on-chain and distributed across the secure global API.', icon: CheckCircle2 }
-               ].map((step, i) => (
-                 <div key={i} className="relative group">
-                    <span className="text-[120px] font-black text-gray-50 absolute -top-24 -left-10 select-none group-hover:text-[#FFF1F2] transition-colors">{step.step}</span>
-                    <div className="relative z-10 space-y-8">
-                       <div className="w-20 h-20 bg-white border border-gray-100 rounded-[30px] shadow-sm flex items-center justify-center text-[#222222] group-hover:bg-[#FF385C] group-hover:text-white transition-all transform group-hover:rotate-6">
-                          <step.icon size={32} />
-                       </div>
-                       <h3 className="text-3xl font-black text-[#222222] tracking-tight">{step.title}</h3>
-                       <p className="text-gray-500 font-medium text-lg leading-relaxed">{step.desc}</p>
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Evidence Screenshot / File <span className="text-gray-400 font-normal">(Max 5)</span></label>
+                    <div className="flex items-center justify-center px-4 py-2.5 border border-gray-300 border-dashed rounded-lg hover:bg-gray-50 cursor-pointer transition-colors bg-gray-50" onClick={() => fileInputRef.current?.click()}>
+                      <CloudUpload className="w-4 h-4 mr-2 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {formData.imageFiles.length > 0 ? `${formData.imageFiles.length} file(s) selected` : 'Click to upload (JPG, PNG, PDF)'}
+                      </span>
                     </div>
-                 </div>
-               ))}
-            </div>
-         </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="px-6 md:px-20 pb-48 pt-24">
-         <div className="max-w-7xl mx-auto bg-gradient-to-br from-[#FF385C] to-[#D70466] rounded-[64px] p-20 text-center text-white relative overflow-hidden shadow-2xl shadow-[#FF385C]/20 group">
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-1000">
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border-[40px] border-white rounded-full" />
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] border-[1px] border-white/50 rounded-full" />
-            </div>
-            
-            <div className="relative z-10 space-y-12 max-w-4xl mx-auto">
-               <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] mb-8">
-                 Ready to defend the Web?
-               </h2>
-               <p className="text-xl md:text-2xl font-medium text-white/80 leading-relaxed max-w-2xl mx-auto">
-                 Join 42,000+ analysts across the globe and earn rewards for securing the digital frontier.
-               </p>
-               <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-                  <button className="px-12 py-6 bg-white text-[#FF385C] rounded-[32px] font-black text-xl shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center gap-3 mx-auto sm:mx-0">
-                    Get Started Now <ArrowRight size={24} />
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf" multiple onChange={(e) => { 
+                      if (e.target.files) {
+                         const filesArray = Array.from(e.target.files).slice(0, 5);
+                         setFormData(p => ({ ...p, imageFiles: filesArray })); 
+                      }
+                    }} />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">Describe What Happened <span className="text-red-500">*</span></label>
+                  <textarea rows={5} className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 resize-none" placeholder="e.g. I received a WhatsApp message claiming to be from SBI bank asking me to click a link and enter my OTP. The link looked like sbi-secure-login.xyz..." value={formData.description} onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))} required />
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <p className="text-xs text-gray-400">All reports are encrypted in transit and stored securely.</p>
+                  <button type="submit" disabled={loading || success} className="inline-flex items-center gap-2 py-2.5 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-800 hover:bg-blue-900 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors">
+                    {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : success ? <><CheckCircle2 className="w-4 h-4" /> Report Submitted!</> : <>Submit Report <ArrowRight className="w-4 h-4" /></>}
                   </button>
-                  <Link href="/about" className="px-12 py-6 bg-transparent border-2 border-white/30 text-white rounded-[32px] font-black text-xl hover:bg-white/10 transition-all mx-auto sm:mx-0">
-                    Learn More
-                  </Link>
-               </div>
+                </div>
+              </form>
             </div>
-         </div>
-      </section>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
+              <h4 className="text-sm font-semibold text-blue-900 mb-2 flex items-center"><Shield className="w-4 h-4 mr-2" /> Your Privacy is Protected</h4>
+              <p className="text-xs text-blue-800 leading-relaxed">Your identity is never made publicly visible. All reports are processed confidentially by the AI engine and reviewed only by authorised government analysts.</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
+                <h4 className="text-sm font-semibold text-gray-900">Why Report?</h4>
+              </div>
+              <div className="p-5 space-y-4">
+                {[
+                  'Help protect fellow citizens from the same scam',
+                  'Get threats flagged and blocked across the internet',
+                  'Create an immutable evidence trail for law enforcement',
+                  'Improve AI models that detect new attack patterns',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                    <p className="text-sm text-gray-600">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+              <h4 className="text-sm font-semibold text-amber-800 mb-2">Emergency?</h4>
+              <p className="text-xs text-amber-700 leading-relaxed">If you have lost money or are in immediate danger, call the National Cyber Crime Helpline at <strong>1930</strong> or visit <a href="https://cybercrime.gov.in" target="_blank" rel="noopener noreferrer" className="underline font-semibold">cybercrime.gov.in</a></p>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── What You Can Report ─── */}
+        <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <AlertTriangle className="w-5 h-5 mr-2 text-gray-400" />
+              What Can You Report?
+            </h3>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                { title: 'Phishing Websites', desc: 'Fake login pages, credential harvesting sites, or deceptive banking portals that trick users into sharing personal information.', icon: Globe },
+                { title: 'Online Scams', desc: 'Fraudulent offers, fake lottery messages, job scams, or social media impersonation targeting citizens.', icon: ShieldAlert },
+                { title: 'Malware & Ransomware', desc: 'Suspicious downloads, infected links, or files that install harmful software on devices without consent.', icon: AlertTriangle },
+                { title: 'Cyber Fraud', desc: 'UPI fraud, fake payment requests, identity theft attempts, or any digital financial crime.', icon: Lock },
+              ].map((cat, i) => (
+                <div key={i} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                  <cat.icon className="w-5 h-5 text-blue-800 mb-3" />
+                  <h4 className="text-sm font-semibold text-gray-900 mb-1.5">{cat.title}</h4>
+                  <p className="text-xs text-gray-500 leading-relaxed">{cat.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ─── How It Works ─── */}
+        <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Zap className="w-5 h-5 mr-2 text-gray-400" />
+              How Your Report Is Processed
+            </h3>
+            <p className="text-sm text-gray-500 mt-1">Every report goes through a rigorous 4-step pipeline before any action is taken.</p>
+          </div>
+          <div className="p-6">
+            <div className="flex flex-col lg:flex-row items-center gap-8">
+              <div className="w-full lg:w-1/3 relative h-[250px] shrink-0 rounded-lg overflow-hidden border border-gray-100 shadow-sm bg-blue-50 flex items-center justify-center order-2 lg:order-1">
+                <Image src="/network.png" alt="GovPortal Cyber Network" fill style={{ objectFit: 'cover' }} className="rounded-lg opacity-90" />
+              </div>
+              <div className="flex-1 space-y-6 order-1 lg:order-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+              {[
+                { step: '1', title: 'You Submit', desc: 'Fill out the form above with a URL, description, or screenshot of the suspicious activity you encountered.', icon: FileText },
+                { step: '2', title: 'AI Classification', desc: 'Our multi-modal AI engine analyses the text, URL structure, and image evidence to classify the threat type and severity.', icon: Cpu },
+                { step: '3', title: 'Blockchain Verification', desc: 'The report and its evidence are cryptographically hashed and stored on an immutable ledger — no one can edit or delete it.', icon: Database },
+                { step: '4', title: 'Agency Distribution', desc: 'Verified threats are distributed to CERT-In and partner agencies for takedown, blocking, and investigation.', icon: Network },
+              ].map((s, i) => (
+                <div key={i} className="relative">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="w-8 h-8 bg-blue-800 text-white rounded-lg flex items-center justify-center text-sm font-bold">{s.step}</span>
+                    <h4 className="text-sm font-semibold text-gray-900">{s.title}</h4>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+                  {i < 3 && <ChevronRight className="hidden md:block absolute -right-3 top-4 w-4 h-4 text-gray-300" />}
+                </div>
+              ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Security & Privacy Standards ─── */}
+        <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Shield className="w-5 h-5 mr-2 text-gray-400" />
+              Security & Privacy Standards
+            </h3>
+            <p className="text-sm text-gray-500 mt-1">Your data is protected at every step of the reporting process.</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 text-left">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Standard</th>
+                  <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Citizen Benefit</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {[
+                  { standard: 'Data Anonymisation', desc: 'All personally identifiable information (PII) is stripped from reports before analysis.', benefit: 'Your identity is never exposed to the public or the scammers.' },
+                  { standard: 'End-to-End Encryption', desc: 'All submitted evidence is encrypted in transit and stored in secure, decentralised vaults.', benefit: 'Ensures that intercepted data cannot be read by malicious actors.' },
+                  { standard: 'Authorised Access Only', desc: 'Detailed report metrics are exclusively accessible by authorised government agencies (e.g. CERT-In).', benefit: 'Law enforcement has the data they need to act quickly, without compromising public privacy.' },
+                  { standard: 'Decentralised Evidence', desc: 'Evidence files cannot be altered, deleted, or taken down once submitted under our immutable ledger.', benefit: 'Prevents scammers from covering their tracks or deleting evidence.' },
+                ].map((row, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{row.standard}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{row.desc}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{row.benefit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ─── Key Principles ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { title: 'Transparency', desc: 'Every piece of data is publicly auditable. The blockchain ledger ensures no report is hidden, modified, or suppressed by any party.', icon: Eye },
+            { title: 'Tamper-Proof Evidence', desc: 'Uploaded screenshots and files are hashed and stored on IPFS. Once submitted, evidence cannot be deleted or altered — even by system administrators.', icon: Lock },
+            { title: 'Rapid Response', desc: 'The AI engine classifies threats within seconds. High-severity reports are automatically escalated to CERT-In for immediate action.', icon: Zap },
+          ].map((feat, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+              <feat.icon className="w-6 h-6 text-blue-800 mb-4" />
+              <h4 className="text-sm font-semibold text-gray-900 mb-2">{feat.title}</h4>
+              <p className="text-sm text-gray-500 leading-relaxed">{feat.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* ─── Bottom CTA ─── */}
+        <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+          <div className="p-8 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Spotted something suspicious?</h3>
+              <p className="mt-1 text-sm text-gray-500 max-w-xl">Scroll up and submit a report. It only takes a minute, and your contribution helps protect millions of citizens from cyber threats.</p>
+            </div>
+            <div className="mt-4 sm:mt-0 flex gap-3">
+              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-flex items-center gap-2 px-5 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-800 hover:bg-blue-900 transition-colors">
+                Report a Threat <ArrowRight className="w-4 h-4" />
+              </button>
+              <Link href="/about" className="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                Learn More
+              </Link>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
-
-
