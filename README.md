@@ -133,9 +133,13 @@ uvicorn api:app --reload
   - Deployed the `inference_api` for real-time classification endpoints.
   - *Future Scope:* Implementation of targeted `detection_of_flagged_domains` against known harmful domains.
 
-- **[Add Contributor Name]**
-  - [Deliverable 1]
-  - [Deliverable 2]
+- **Varun kushwaha**
+  - Designed and implemented the decentralized evidence storage pipeline using **IPFS (Pinata)** for secure and distributed data storage.
+  - Integrated Blockchain (Ethereum Sepolia) to store:
+        - **Evidence hashes (IPFS CID)**
+        - **Report metadata (JSON)**
+  - Built the end-to-end pipeline for report handling:
+→ Evidence upload → IPFS storage → Hash generation → Blockchain logging
 
 - **[Add Contributor Name]**
   - [Deliverable 1]
