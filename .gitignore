@@ -1,4 +1,18 @@
-.venv/
+
+# Virtual environments
 venv/
-env/
+venv
+.venv/
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# Node modules
+node_modules/
+
+# Python
 __pycache__/
+*.py[cod]
+*$py.class

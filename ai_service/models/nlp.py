@@ -31,7 +31,7 @@ from transformers import pipeline
 _classifier = pipeline(
     "zero-shot-classification",
     model="facebook/bart-large-mnli",
-    device=0,
+    device=-1,
 )
 
 LABELS: list[str] = [
