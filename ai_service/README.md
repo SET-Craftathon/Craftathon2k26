@@ -96,7 +96,8 @@ LABELS = [
 ### 5. Running the Pipeline
 
 ```bash
-python -m ai_service.run_test
+cd ai_service
+uvicorn api:app --reload
 ```
 
 ### 6. Testing
@@ -133,7 +134,7 @@ pytest -s
 ---
 
 ```
-curl -s -X POST http://localhost:8000/classify -H "Content-Type: application/json" -d "{\"text\": \"If you tell anyone I will make you regret it\"}" | python -m json.tool
+curl -X POST http://localhost:8000/classify -F "text=If you tell anyone I will make you regret it"
 ```
 ## Module Structure
 
