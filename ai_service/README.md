@@ -96,6 +96,15 @@ LABELS = [
 ### 5. Running the Pipeline
 
 ```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+```bash
+pip install -r ai_service/requirements.txt
+```
+
+```bash
 cd ai_service
 uvicorn api:app --reload
 ```
