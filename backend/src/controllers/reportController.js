@@ -5,15 +5,14 @@ const Report = require("../models/reportModel");
 
 exports.handleReport = async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: "No evidence files provided" });
-        }
+        const files = req.files || [];
+        let aiResult;
 
-        const uploadPromises = req.files.map(async (file) => {
-            let aiResult;
+        const uploadPromises = files.map(async (file) => {
+            let localAiResult;
             if (req.body.aiConfidence && req.body.severity) {
                 // Use already processed AI output
-                aiResult = {
+                localAiResult = {
                     description: req.body.description || "",
                     contentType: req.body.contentType || "unknown",
                     aiConfidence: req.body.aiConfidence,
@@ -22,19 +21,19 @@ exports.handleReport = async (req, res) => {
                 };
             } else {
                 // Run AI analysis
-                aiResult = await analyzeContent(
+                localAiResult = await analyzeContent(
                     req.body.description || "",
                     file.buffer,
                     file.originalname,
                 );
             }
 
-            const imageBuffer = aiResult.file;
-            delete aiResult.file;
+            const imageBuffer = localAiResult.file;
+            delete localAiResult.file;
 
             const { evidenceCID, evidenceURL } = await uploadToIPFS(imageBuffer ?? file.buffer, file.originalname);
 
-            return { evidenceCID, evidenceURL, aiResult };
+            return { evidenceCID, evidenceURL, aiResult: localAiResult };
         });
 
         const results = await Promise.all(uploadPromises);
@@ -42,8 +41,16 @@ exports.handleReport = async (req, res) => {
         const evidenceCID = results.map((r) => r.evidenceCID);
         const evidenceURL = results.map((r) => r.evidenceURL);
 
-        // take AI result from first file
-        const aiResult = results[0].aiResult;
+        if (results.length > 0) {
+            aiResult = results[0].aiResult;
+        } else {
+            aiResult = {
+                description: req.body.description || "",
+                contentType: req.body.contentType || "unknown",
+                aiConfidence: req.body.aiConfidence || "0.0",
+                severity: req.body.severity || "LOW"
+            };
+        }
 
         const reportJSON = {
             ...req.body,

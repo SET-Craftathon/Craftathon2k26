@@ -33,7 +33,7 @@ from PIL import Image
 from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
 _MODEL_ID = "Falconsai/nsfw_image_detection"
-_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+_DEVICE = "cpu"
 
 _extractor: AutoFeatureExtractor | None = None
 _model: AutoModelForImageClassification | None = None

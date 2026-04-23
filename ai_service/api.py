@@ -31,6 +31,10 @@ async def classify_endpoint(
         image_content_type = image.content_type
         if image_bytes:
             try:
+                import pillow_avif
+            except ImportError:
+                pass
+            try:
                 image_obj = Image.open(io.BytesIO(image_bytes)).convert("RGB")
             except Exception as e:
                 raise HTTPException(status_code=400, detail=f"Invalid image file: {e}")
