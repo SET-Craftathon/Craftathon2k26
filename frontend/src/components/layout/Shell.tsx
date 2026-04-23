@@ -31,25 +31,24 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       {showAdminUI && <CommandPalette />}
 
       <div className={clsx(
-        'flex h-screen overflow-hidden transition-colors duration-500',
-        showAdminUI ? 'bg-[var(--bg-base)]' : 'bg-white'
+        'flex h-screen overflow-hidden transition-colors duration-500 font-sans',
+        'bg-gray-50'
       )}>
         {showAdminUI && <Sidebar />}
-        <div className="flex flex-col flex-1 overflow-hidden relative">
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
           {showAdminUI && <Topbar />}
           {isPublicPage && <LandingHeader />}
           <main className={clsx(
-            'flex-1 overflow-y-auto w-full relative',
-            showAdminUI ? 'p-8 pb-12' : ''
+            'flex-1 overflow-y-auto overflow-x-hidden w-full relative',
+            showAdminUI ? 'p-4 sm:p-6 lg:p-8' : ''
           )}>
-            {children}
+            <div className={clsx(showAdminUI && "mx-auto w-full max-w-7xl")}>
+              {children}
+            </div>
             {isPublicPage && <LandingFooter />}
           </main>
-
         </div>
       </div>
     </>
   );
 }
-
-

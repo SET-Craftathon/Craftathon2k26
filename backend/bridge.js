@@ -6,7 +6,7 @@ const BannedUrl = require('./src/models/bannedUrl');
 
 // 1. Setup Express and WebSocket Server on Port 3000
 const app = express();
-const server = app.listen(3000, () => {
+const server = app.listen(3001, () => {
   console.log("🚀 Webhook-to-WebSocket Bridge running on port 3000");
   console.log("Waiting for Chrome Extensions to connect...");
 });
